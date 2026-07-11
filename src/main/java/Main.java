@@ -1,4 +1,5 @@
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -35,8 +36,33 @@ public class Main {
             }
         }
     } else {
+        //new : running real one
+        String[] parts = input.split(" ");
+        String command = parts[0];
+        String pathEnv = System.getenv("PATH");
+        String[] dirs = pathEnv.split(":");
+        boolean found = false;
+
+        for (String dir : dirs){
+            File file = new File(dir, command);
+            if (file.exists() && file.canExecute()){
+                found = true;
+                break;
+            }
+        }
+        if (found){
+            try{
+            ProcessBuilder pb = new ProcessBuilder(parts);
+            pb.inheritIO();
+            Process process = pb.start();
+            process.waitFor();
+            } catch (IOException e){
+                System.out.println(command + ": error running program");
+        }
+        } else {
         System.out.println(input + ": command not found");
     }
 }
     }
+}
 }
