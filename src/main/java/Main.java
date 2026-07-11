@@ -1,3 +1,4 @@
+import java.io.File;
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -17,11 +18,25 @@ public class Main {
                 if (Arrays.asList(builtins).contains(word)) {
                     System.out.println(word + " is a shell builtin");
                 } else {
-                    System.out.println(word + ": not found");
+                    //new 
+                String pathEnv = System.getenv("PATH");
+                String[] dirs = pathEnv.split(":");
+                boolean found = false;
+                for (String dir : dirs){
+                    File file = new File ( dir , word);
+                    if (file.exists() && file.canExecute()){
+                        System.out.println(word + " is " + file.getPath());
+                        found = true;
+                        break;
+                    }
                 }
-            } else {
-                System.out.println(input + ": command not found");
+            if (!found){
+                System.out.println(word + " not found");
             }
         }
+    } else {
+        System.out.println(input + ": command not found");
+    }
+}
     }
 }
