@@ -6,7 +6,9 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) throws Exception {
         Scanner scanner = new Scanner(System.in);
-        String[] builtins = {"exit", "echo", "type"};
+        String[] builtins = {"exit", "echo", "type","pwd"};
+        String currentDir = System.getProperty("user.dir");
+
         while(true){
             System.out.print("$ ");
             String input = scanner.nextLine();
@@ -14,6 +16,8 @@ public class Main {
                 break;
             } else if(input.startsWith("echo")){
                 System.out.println(input.substring(5));
+            } else if (input.equals("pwd")){
+                System.out.println(currentDir);
             } else if (input.startsWith("type ")){
                 String word = input.substring(4).trim();
                 if (Arrays.asList(builtins).contains(word)) {
@@ -32,7 +36,7 @@ public class Main {
                     }
                 }
             if (!found){
-                System.out.println(word + " not found");
+                System.out.println(word + ": not found");
             }
         }
     } else {
