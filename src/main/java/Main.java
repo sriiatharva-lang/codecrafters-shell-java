@@ -21,7 +21,11 @@ public class Main {
                 System.out.println(currentDir);
             } else if (input.startsWith("cd ")) {
                 String targetPath = input.substring(3).trim();
-                File dir = new File(currentDir, targetPath);
+                File dir = new File(targetPath);
+
+                if ( !dir.isAbsolute()){
+                    dir = new File(currentDir, targetPath);
+                }
 
                 if (dir.exists() && dir.isDirectory()) {
                     currentDir = dir.getCanonicalPath();
