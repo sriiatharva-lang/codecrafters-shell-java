@@ -24,7 +24,7 @@ public class Main {
                 File dir = new File(currentDir, targetPath);
 
                 if (dir.exists() && dir.isDirectory()) {
-                    currentDir = dir.getAbsolutePath();
+                    currentDir = dir.getCanonicalPath();
                 } else {
                     System.out.println("cd: " + targetPath + ": No such file or directory");
                 }
