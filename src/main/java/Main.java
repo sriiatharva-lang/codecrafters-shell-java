@@ -21,8 +21,14 @@ public class Main {
                 System.out.println(currentDir);
             } else if (input.startsWith("cd ")) {
                 String targetPath = input.substring(3).trim();
-                File dir = new File(targetPath);
 
+                if (targetPath.equals("~")){
+                    String home = System.getenv("HOME");
+                    if (home != null) {
+                        targetPath = home;
+                    }
+                }
+                File dir = new File(targetPath);
                 if ( !dir.isAbsolute()){
                     dir = new File(currentDir, targetPath);
                 }
