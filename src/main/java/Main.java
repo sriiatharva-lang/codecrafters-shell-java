@@ -42,9 +42,16 @@ public class Main {
 
             if (input.equals("exit")) {
                 break;
-            } else if (input.startsWith("echo")) {
-                System.out.println(input.substring(5));
-            } else if (input.equals("pwd")) {
+                } else if (input.startsWith("echo")) {
+    List<String> parts = parseInput(input);
+    StringBuilder result = new StringBuilder();
+    for (int i = 1; i < parts.size(); i++) {
+        if (i > 1) result.append(" ");
+        result.append(parts.get(i));
+    }
+    System.out.println(result.toString());
+}
+             else if (input.equals("pwd")) {
                 System.out.println(currentDir);
             } else if (input.startsWith("cd ")) {
                 String targetPath = input.substring(3).trim();
