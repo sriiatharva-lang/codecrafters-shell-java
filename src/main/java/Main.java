@@ -1,9 +1,36 @@
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
+
+   public static List<String> parseInput(String input) {
+    List<String> parts = new ArrayList<>();
+    StringBuilder current = new StringBuilder();
+    boolean insideQuotes = false;
+
+    for (char c : input.toCharArray()) {
+        if (c == '\'') {
+            insideQuotes = !insideQuotes;
+        } else if (c == ' ' && !insideQuotes) {
+            if (current.length() > 0) {
+                parts.add(current.toString());
+                current.setLength(0);
+            }
+        } else {
+            current.append(c);
+        }
+    }
+
+    if (current.length() > 0) {
+        parts.add(current.toString());
+    }
+
+    return parts;
+}
     public static void main(String[] args) throws Exception {
         Scanner scanner = new Scanner(System.in);
         String[] builtins = {"exit", "echo", "type", "pwd", "cd"};
