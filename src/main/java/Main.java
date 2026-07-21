@@ -17,7 +17,19 @@ public class Main {
             char c = input.charAt(i);
              
             if(c == '\\' && !insideSingleQuotes && !insideDoubleQuotes){
+                if (i + 1 < input.length()) {
+                    current.append(input.charAt(i + 1));
+                    i++;
+                }
+            } else if(c == '\\' && insideDoubleQuotes){
                 if(i + 1 < input.length()){
+                    char next = input.charAt(i + 1);
+                    if(next == '\'' || next == '"' || next == '\\' || next == ' ') {
+                        current.append(next);
+                        i++;
+                    } else {
+                        current.append(c);
+                    }
                     current.append(input.charAt(i + 1));
                     i++; 
             }
@@ -37,7 +49,7 @@ public class Main {
         if (current.length() > 0) {
             parts.add(current.toString());
         }
-        return parts;
+        return parts; 
     }
 
     public static void main(String[] args) throws Exception {
