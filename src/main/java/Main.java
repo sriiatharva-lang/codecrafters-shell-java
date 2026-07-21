@@ -10,12 +10,15 @@ public class Main {
     public static List<String> parseInput(String input) {
         List<String> parts = new ArrayList<>();
         StringBuilder current = new StringBuilder();
-        boolean insideQuotes = false;
+        boolean insideSingleQuotes = false;
+        boolean insideDoubleQuotes = false;
 
         for (char c : input.toCharArray()) {
-            if (c == '\'') {
-                insideQuotes = !insideQuotes;
-            } else if (c == ' ' && !insideQuotes) {
+            if (c == '\'' && !insideDoubleQuotes) {
+                insideSingleQuotes = !insideSingleQuotes;
+            } else if (c == '"' && !insideSingleQuotes) {
+                insideDoubleQuotes = !insideDoubleQuotes;
+            } else if (c == ' ' && !insideSingleQuotes && !insideDoubleQuotes) {
                 if (current.length() > 0) {
                     parts.add(current.toString());
                     current.setLength(0);
@@ -24,11 +27,9 @@ public class Main {
                 current.append(c);
             }
         }
-
         if (current.length() > 0) {
             parts.add(current.toString());
         }
-
         return parts;
     }
 
