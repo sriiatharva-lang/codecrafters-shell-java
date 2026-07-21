@@ -30,8 +30,6 @@ public class Main {
                     } else {
                         current.append(c);
                     }
-                    current.append(input.charAt(i + 1));
-                    i++; 
             }
         } else if (c == '\'' && !insideDoubleQuotes) {
             insideSingleQuotes = !insideSingleQuotes;
