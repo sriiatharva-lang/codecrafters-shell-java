@@ -13,9 +13,16 @@ public class Main {
         boolean insideSingleQuotes = false;
         boolean insideDoubleQuotes = false;
 
-        for (char c : input.toCharArray()) {
-            if (c == '\'' && !insideDoubleQuotes) {
-                insideSingleQuotes = !insideSingleQuotes;
+        for (int i =0; i < input.length(); i++) {
+            char c = input.charAt(i);
+             
+            if(c == '\\' && !insideSingleQuotes && !insideDoubleQuotes){
+                if(i + 1 < input.length()){
+                    current.append(input.charAt(i + 1));
+                    i++; 
+            }
+        } else if (c == '\'' && !insideDoubleQuotes) {
+            insideDoubleQuotes = !insideDoubleQuotes;
             } else if (c == '"' && !insideSingleQuotes) {
                 insideDoubleQuotes = !insideDoubleQuotes;
             } else if (c == ' ' && !insideSingleQuotes && !insideDoubleQuotes) {
