@@ -22,7 +22,7 @@ public class Main {
                     i++; 
             }
         } else if (c == '\'' && !insideDoubleQuotes) {
-            insideDoubleQuotes = !insideDoubleQuotes;
+            insideSingleQuotes = !insideSingleQuotes;
             } else if (c == '"' && !insideSingleQuotes) {
                 insideDoubleQuotes = !insideDoubleQuotes;
             } else if (c == ' ' && !insideSingleQuotes && !insideDoubleQuotes) {
