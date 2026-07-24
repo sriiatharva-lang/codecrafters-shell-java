@@ -114,34 +114,52 @@ public class Main {
                     }
                 }
             } else {
-                List<String> parsedParts = parseInput(input);
-                String[] parts = parsedParts.toArray(new String[0]);
-                String command = parts[0];
+               List <String> tokens = parseInput(input);
+               String outputFile = null;
+               
+               for (int i = 0; i < tokens.size(); i++) {
+                if (tokens.get(i).equals(">") || tokens.get(i).equals("1>")) {
+                    outputFile = tokens.get(i +1);
+                    tokens = tokens.subList(0, i);
+                    break;
+               }
+            }
 
-                String pathEnv = System.getenv("PATH");
-                String[] dirs = pathEnv.split(":");
-                boolean found = false;
+            String[] parts = tokens.toArray(new String[0]);
+            String command = parts[0];
 
-                for (String dir : dirs) {
-                    File file = new File(dir, command);
-                    if (file.exists() && file.canExecute()) {
-                        found = true;
-                        break;
-                    }
+            String pathEnv = System.getenv("PATH");
+            String[] dirs = pathEnv.split(":");
+            boolean found = false;
+
+            for(String dir : dirs){
+                File file = new File(dir, command);
+                if (file.exists() && file.canExecute()){
+                    found = true;
+                    break;
                 }
-
-                if (found) {
-                    try {
-                        ProcessBuilder pb = new ProcessBuilder(parts);
+            }
+            if(found){
+                try {
+                    ProcessBuilder pb = new ProcessBuilder(parts);
+                    if(outputFile != null){
+                        pb.redirectOutput(new File(outputFile));
+                        pb.redirectError(ProcessBuilder.Redirect.INHERIT);
+                        pb.redirectInput(ProcessBuilder.Redirect.INHERIT);
+                    } else {
                         pb.inheritIO();
-                        Process process = pb.start();
-                        process.waitFor();
-                    } catch (IOException e) {
-                        System.out.println(command + ": error running program");
                     }
-                } else {
-                    System.out.println(input + ": command not found");
+                    Process process = pb.start();
+                    process.waitFor();
+                    
+                } catch (IOException e) {
+                    System.out.println(command + ": error running program");
                 }
+
+            } else {
+                System.out.println(command + ": command not found");
+            }
+
             }
         }
     }
