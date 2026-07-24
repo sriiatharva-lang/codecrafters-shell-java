@@ -62,14 +62,32 @@ public class Main {
             if (input.equals("exit")) {
                 break;
             } else if (input.startsWith("echo")) {
-                List<String> parts = parseInput(input);
-                StringBuilder result = new StringBuilder();
-                for (int i = 1; i < parts.size(); i++) {
-                    if (i > 1) result.append(" ");
-                    result.append(parts.get(i));
-                }
-                System.out.println(result.toString());
-            } else if (input.equals("pwd")) {
+    List<String> tokens = parseInput(input);
+    String outputFile = null;
+
+    for (int i = 0; i < tokens.size(); i++) {
+        if (tokens.get(i).equals(">") || tokens.get(i).equals("1>")) {
+            outputFile = tokens.get(i + 1);
+            tokens = tokens.subList(0, i);
+            break;
+        }
+    }
+
+    StringBuilder result = new StringBuilder();
+    for (int i = 1; i < tokens.size(); i++) {
+        if (i > 1) result.append(" ");
+        result.append(tokens.get(i));
+    }
+
+    if (outputFile != null) {
+        java.io.FileWriter writer = new java.io.FileWriter(outputFile);
+        writer.write(result.toString());
+        writer.write(System.lineSeparator());
+        writer.close();
+    } else {
+        System.out.println(result.toString());
+    }
+} else if (input.equals("pwd")) {
                 System.out.println(currentDir);
             } else if (input.startsWith("cd ")) {
                 String targetPath = input.substring(3).trim();
