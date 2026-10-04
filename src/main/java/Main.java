@@ -66,33 +66,42 @@ public class Main {
                 break;
 
             } else if (input.startsWith("echo")) {
-                List<String> tokens = parseInput(input);
-                String outputFile = null;
+    List<String> tokens = parseInput(input);
+    String outputFile = null;
+    String errorFile = null;
 
-                for (int i = 0; i < tokens.size(); i++) {
-                    if (tokens.get(i).equals(">") || tokens.get(i).equals("1>")) {
-                        outputFile = tokens.get(i + 1);
-                        tokens = tokens.subList(0, i);
-                        break;
-                    }
-                }
+    for (int i = 0; i < tokens.size(); i++) {
+        if (tokens.get(i).equals(">") || tokens.get(i).equals("1>")) {
+            outputFile = tokens.get(i + 1);
+            tokens = tokens.subList(0, i);
+            break;
+        } else if (tokens.get(i).equals("2>")) {
+            errorFile = tokens.get(i + 1);
+            tokens = tokens.subList(0, i);
+            break;
+        }
+    }
 
-                StringBuilder result = new StringBuilder();
-                for (int i = 1; i < tokens.size(); i++) {
-                    if (i > 1) result.append(" ");
-                    result.append(tokens.get(i));
-                }
+    StringBuilder result = new StringBuilder();
+    for (int i = 1; i < tokens.size(); i++) {
+        if (i > 1) result.append(" ");
+        result.append(tokens.get(i));
+    }
 
-                if (outputFile != null) {
-                    FileWriter writer = new FileWriter(outputFile);
-                    writer.write(result.toString());
-                    writer.write(System.lineSeparator());
-                    writer.close();
-                } else {
-                    System.out.println(result.toString());
-                }
+    if (errorFile != null) {
+        FileWriter errWriter = new FileWriter(errorFile);
+        errWriter.close();
+    }
 
-            } else if (input.equals("pwd")) {
+    if (outputFile != null) {
+        FileWriter writer = new FileWriter(outputFile);
+        writer.write(result.toString());
+        writer.write(System.lineSeparator());
+        writer.close();
+    } else {
+        System.out.println(result.toString());
+    }
+} else if (input.equals("pwd")) {
                 System.out.println(currentDir);
 
             } else if (input.startsWith("cd ")) {
