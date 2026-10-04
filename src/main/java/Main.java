@@ -1,4 +1,5 @@
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,26 +14,26 @@ public class Main {
         boolean insideSingleQuotes = false;
         boolean insideDoubleQuotes = false;
 
-        for (int i =0; i < input.length(); i++) {
+        for (int i = 0; i < input.length(); i++) {
             char c = input.charAt(i);
-             
-            if(c == '\\' && !insideSingleQuotes && !insideDoubleQuotes){
+
+            if (c == '\\' && !insideSingleQuotes && !insideDoubleQuotes) {
                 if (i + 1 < input.length()) {
                     current.append(input.charAt(i + 1));
                     i++;
                 }
-            } else if(c == '\\' && insideDoubleQuotes){
-                if(i + 1 < input.length()){
+            } else if (c == '\\' && insideDoubleQuotes) {
+                if (i + 1 < input.length()) {
                     char next = input.charAt(i + 1);
-                    if(next == '\'' || next == '"' || next == '\\' || next == ' ') {
+                    if (next == '"' || next == '\\' || next == '$' || next == '`') {
                         current.append(next);
                         i++;
                     } else {
                         current.append(c);
                     }
-            }
-        } else if (c == '\'' && !insideDoubleQuotes) {
-            insideSingleQuotes = !insideSingleQuotes;
+                }
+            } else if (c == '\'' && !insideDoubleQuotes) {
+                insideSingleQuotes = !insideSingleQuotes;
             } else if (c == '"' && !insideSingleQuotes) {
                 insideDoubleQuotes = !insideDoubleQuotes;
             } else if (c == ' ' && !insideSingleQuotes && !insideDoubleQuotes) {
@@ -44,10 +45,12 @@ public class Main {
                 current.append(c);
             }
         }
+
         if (current.length() > 0) {
             parts.add(current.toString());
         }
-        return parts; 
+
+        return parts;
     }
 
     public static void main(String[] args) throws Exception {
@@ -61,34 +64,37 @@ public class Main {
 
             if (input.equals("exit")) {
                 break;
+
             } else if (input.startsWith("echo")) {
-    List<String> tokens = parseInput(input);
-    String outputFile = null;
+                List<String> tokens = parseInput(input);
+                String outputFile = null;
 
-    for (int i = 0; i < tokens.size(); i++) {
-        if (tokens.get(i).equals(">") || tokens.get(i).equals("1>")) {
-            outputFile = tokens.get(i + 1);
-            tokens = tokens.subList(0, i);
-            break;
-        }
-    }
+                for (int i = 0; i < tokens.size(); i++) {
+                    if (tokens.get(i).equals(">") || tokens.get(i).equals("1>")) {
+                        outputFile = tokens.get(i + 1);
+                        tokens = tokens.subList(0, i);
+                        break;
+                    }
+                }
 
-    StringBuilder result = new StringBuilder();
-    for (int i = 1; i < tokens.size(); i++) {
-        if (i > 1) result.append(" ");
-        result.append(tokens.get(i));
-    }
+                StringBuilder result = new StringBuilder();
+                for (int i = 1; i < tokens.size(); i++) {
+                    if (i > 1) result.append(" ");
+                    result.append(tokens.get(i));
+                }
 
-    if (outputFile != null) {
-        java.io.FileWriter writer = new java.io.FileWriter(outputFile);
-        writer.write(result.toString());
-        writer.write(System.lineSeparator());
-        writer.close();
-    } else {
-        System.out.println(result.toString());
-    }
-} else if (input.equals("pwd")) {
+                if (outputFile != null) {
+                    FileWriter writer = new FileWriter(outputFile);
+                    writer.write(result.toString());
+                    writer.write(System.lineSeparator());
+                    writer.close();
+                } else {
+                    System.out.println(result.toString());
+                }
+
+            } else if (input.equals("pwd")) {
                 System.out.println(currentDir);
+
             } else if (input.startsWith("cd ")) {
                 String targetPath = input.substring(3).trim();
 
@@ -98,6 +104,7 @@ public class Main {
                         targetPath = home;
                     }
                 }
+
                 File dir = new File(targetPath);
                 if (!dir.isAbsolute()) {
                     dir = new File(currentDir, targetPath);
@@ -108,6 +115,7 @@ public class Main {
                 } else {
                     System.out.println("cd: " + targetPath + ": No such file or directory");
                 }
+
             } else if (input.startsWith("type ")) {
                 String word = input.substring(4).trim();
 
@@ -131,53 +139,65 @@ public class Main {
                         System.out.println(word + ": not found");
                     }
                 }
+
             } else {
-               List <String> tokens = parseInput(input);
-               String outputFile = null;
-               
-               for (int i = 0; i < tokens.size(); i++) {
-                if (tokens.get(i).equals(">") || tokens.get(i).equals("1>")) {
-                    outputFile = tokens.get(i +1);
-                    tokens = tokens.subList(0, i);
-                    break;
-               }
-            }
+                List<String> tokens = parseInput(input);
+                String outputFile = null;
+                String errorFile = null;
 
-            String[] parts = tokens.toArray(new String[0]);
-            String command = parts[0];
-
-            String pathEnv = System.getenv("PATH");
-            String[] dirs = pathEnv.split(":");
-            boolean found = false;
-
-            for(String dir : dirs){
-                File file = new File(dir, command);
-                if (file.exists() && file.canExecute()){
-                    found = true;
-                    break;
-                }
-            }
-            if(found){
-                try {
-                    ProcessBuilder pb = new ProcessBuilder(parts);
-                    if(outputFile != null){
-                        pb.redirectOutput(new File(outputFile));
-                        pb.redirectError(ProcessBuilder.Redirect.INHERIT);
-                        pb.redirectInput(ProcessBuilder.Redirect.INHERIT);
-                    } else {
-                        pb.inheritIO();
+                for (int i = 0; i < tokens.size(); i++) {
+                    if (tokens.get(i).equals(">") || tokens.get(i).equals("1>")) {
+                        outputFile = tokens.get(i + 1);
+                        tokens = tokens.subList(0, i);
+                        break;
+                    } else if (tokens.get(i).equals("2>")) {
+                        errorFile = tokens.get(i + 1);
+                        tokens = tokens.subList(0, i);
+                        break;
                     }
-                    Process process = pb.start();
-                    process.waitFor();
-                    
-                } catch (IOException e) {
-                    System.out.println(command + ": error running program");
                 }
 
-            } else {
-                System.out.println(command + ": command not found");
-            }
+                String[] parts = tokens.toArray(new String[0]);
+                String command = parts[0];
 
+                String pathEnv = System.getenv("PATH");
+                String[] dirs = pathEnv.split(":");
+                boolean found = false;
+
+                for (String dir : dirs) {
+                    File file = new File(dir, command);
+                    if (file.exists() && file.canExecute()) {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (found) {
+                    try {
+                        ProcessBuilder pb = new ProcessBuilder(parts);
+
+                        if (outputFile != null) {
+                            pb.redirectOutput(new File(outputFile));
+                        } else {
+                            pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+                        }
+
+                        if (errorFile != null) {
+                            pb.redirectError(new File(errorFile));
+                        } else {
+                            pb.redirectError(ProcessBuilder.Redirect.INHERIT);
+                        }
+
+                        pb.redirectInput(ProcessBuilder.Redirect.INHERIT);
+
+                        Process process = pb.start();
+                        process.waitFor();
+                    } catch (IOException e) {
+                        System.out.println(command + ": error running program");
+                    }
+                } else {
+                    System.out.println(input + ": command not found");
+                }
             }
         }
     }
